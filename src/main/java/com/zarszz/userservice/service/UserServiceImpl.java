@@ -6,6 +6,7 @@ import com.zarszz.userservice.repo.RoleRepo;
 import com.zarszz.userservice.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -73,7 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public List<User> getUsers() {
-        log.info("Fetching all users");
-        return userRepo.findAll();
+        List<User> users = userRepo.findAll();
+        return users;
     }
 }
