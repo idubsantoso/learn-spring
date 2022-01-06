@@ -88,7 +88,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Cacheable(value = Config.ALL_USER, keyGenerator = Config.GENERATOR_CACHE_KEY)
     public List<User> getUsers() {
-        List<User> users = userRepo.findAll();
-        return users;
+        return userRepo.findAll();
     }
 }
