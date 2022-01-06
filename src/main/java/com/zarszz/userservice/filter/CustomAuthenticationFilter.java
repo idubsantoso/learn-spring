@@ -26,34 +26,42 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
     private final AuthenticationManager authenticationManager;
+    private String refreshTokenExpire;
+    private String accessTokenExpire;
 
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
+
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+            throws AuthenticationException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         log.info("Username is: {}", username);
         log.info("Password is: {}", password);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+                password);
         return authenticationManager.authenticate(authenticationToken);
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+            Authentication authentication) throws IOException, ServletException {
         User user = (User) authentication.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 5000 * 60 * 1000)) // 5 minutes
+                .withExpiresAt(new Date(System.currentTimeMillis() + Long.parseLong(accessTokenExpire))) // 5 minutes
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .withClaim("roles",
+                        user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 120 * 60 * 1000)) // 120 minutes
+                .withExpiresAt(new Date(System.currentTimeMillis() + Long.parseLong(refreshTokenExpire))) // 120 minutes
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
         Map<String, String> tokens = new HashMap<>();
@@ -61,5 +69,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         tokens.put("refresh_token", refresh_token);
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+    }
+
+    public void setRefreshTokenExpire(String refreshTokenExpire) {
+        this.refreshTokenExpire = refreshTokenExpire;
+    }
+
+    public void setAccessTokenExpire(String accessTokenExpire) {
+        this.accessTokenExpire = accessTokenExpire;
     }
 }

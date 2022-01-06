@@ -3,6 +3,8 @@ package com.zarszz.userservice.security;
 import com.zarszz.userservice.filter.CustomAuthenticationFilter;
 import com.zarszz.userservice.filter.CustomAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,13 @@ import static org.springframework.http.HttpMethod.POST;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${spring.access_token_expire_time}")
+    private String accessTokenExpireTime;
+
+    @Value("${spring.refresh_token_expire_time}")
+    private String refreshTokenExpireTime;
+
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -33,6 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
+        customAuthenticationFilter.setAccessTokenExpire(accessTokenExpireTime);
+        customAuthenticationFilter.setRefreshTokenExpire(refreshTokenExpireTime);
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
