@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import javax.validation.Valid;
+
 import com.zarszz.userservice.domain.Product;
 import com.zarszz.userservice.response.v1.exception.ErrorResponse;
 import com.zarszz.userservice.service.ProductServiceImpl;
@@ -12,6 +14,10 @@ import com.zarszz.userservice.service.ProductServiceImpl;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import com.zarszz.userservice.requests.v1.product.CreateProductDto;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,7 +44,11 @@ public class ProductResource {
     @Value("${reflectoring.trace:false}")
     private boolean printStackTrace;
 
+    @Autowired
     private final ProductServiceImpl productService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping("/products")
     ResponseEntity<List<Product>> getProducts() {
@@ -47,8 +57,9 @@ public class ProductResource {
     }
 
     @PostMapping("/products")
-    ResponseEntity<Product> create(@RequestBody Product product) {
+    ResponseEntity<Product> create(@Valid @RequestBody CreateProductDto productDto) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/products").toUriString());
+        Product product = convertToEntity(productDto);
         return ResponseEntity.created(uri).body(this.productService.save(product));
     }
 
@@ -79,6 +90,14 @@ public class ProductResource {
         return ResponseEntity.unprocessableEntity().body(errorResponse);
     }
 
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleAllUncaughtException(
+            Exception exception,
+            WebRequest request) {
+        return buildErrorResponse(exception, "Unknown error occurred", HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(
             Exception exception,
             HttpStatus httpStatus,
@@ -99,9 +118,13 @@ public class ProductResource {
     }
 
     private boolean isTraceOn(WebRequest request) {
-        String [] value = request.getParameterValues(TRACE);
+        String[] value = request.getParameterValues(TRACE);
         return Objects.nonNull(value)
-            && value.length > 0
-            && value[0].contentEquals("true");
+                && value.length > 0
+                && value[0].contentEquals("true");
+    }
+
+    private Product convertToEntity(CreateProductDto productDto) {
+        return modelMapper.map(productDto, Product.class);
     }
 }
