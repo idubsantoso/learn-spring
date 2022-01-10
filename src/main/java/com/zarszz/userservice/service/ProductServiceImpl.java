@@ -1,6 +1,8 @@
 package com.zarszz.userservice.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+
 import javax.transaction.Transactional;
 
 import com.zarszz.userservice.config.Config;
@@ -31,8 +33,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Cacheable(value = Config.PRODUCT_STRING, key = "#id")
-    public Product get(Long id) throws Exception {
-        return this.productRepo.findById(id).orElseThrow(() -> new NotFoundException(""));
+    public Product get(Long id) throws NoSuchElementException {
+        return this.productRepo.findById(id).orElseThrow(() -> new NoSuchElementException("Product Not Found"));
     }
 
     @Override
