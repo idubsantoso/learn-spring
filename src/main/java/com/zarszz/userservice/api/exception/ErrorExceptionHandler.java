@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import io.sentry.Sentry;
+
 @ControllerAdvice
 public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
     public static final String TRACE = "trace";
@@ -45,6 +47,7 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
             Exception exception,
             HttpStatus httpStatus,
             WebRequest request) {
+        Sentry.captureException(exception);
         return buildErrorResponse(exception, exception.getMessage(), httpStatus, request);
     }
 
@@ -53,6 +56,7 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
             String message,
             HttpStatus httpStatus,
             WebRequest request) {
+        Sentry.captureException(exception);
         ErrorResponse errorResponse = new ErrorResponse(httpStatus.value(), exception.getMessage());
         if (printStackTrace && isTraceOn(request)) {
             errorResponse.setStackTrace(ExceptionUtils.getStackTrace(exception));
@@ -67,6 +71,7 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus httpStatus,
             WebRequest request) {
+        Sentry.captureException(exception);
         return buildErrorResponse(exception, httpStatus, request);
     }
 
@@ -77,6 +82,7 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
+        Sentry.captureException(ex);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(),
                 "Validation error. Check 'errors' field for details.");
 
