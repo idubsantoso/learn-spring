@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api;
+package com.zarszz.userservice.controller;
 
 import com.zarszz.userservice.requests.v1.email.ValidateSecretCodeDto;
 import com.zarszz.userservice.service.SecretCodeServiceImpl;
@@ -13,7 +13,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/secret-code")
-public class SecretCodeResource {
+public class SecretCodeController {
     @Autowired
     SecretCodeServiceImpl secretCodeService;
 

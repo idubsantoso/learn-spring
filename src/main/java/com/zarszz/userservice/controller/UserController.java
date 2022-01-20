@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api;
+package com.zarszz.userservice.controller;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -7,8 +7,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;
+import com.zarszz.userservice.requests.v1.role.AddRoleToUserDto;
 import com.zarszz.userservice.service.UserService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class UserResource {
+public class UserController {
     private final UserService userService;
 
     @GetMapping("/users")
@@ -51,8 +51,8 @@ public class UserResource {
     }
 
     @PostMapping("/role/addtouser")
-    public ResponseEntity<?> addRoleToUser(@RequestBody RoleToUserForm form) throws ResponseStatusException {
-        userService.addRoleToUser(form.getUsername(), form.getRoleName());
+    public ResponseEntity<?> addRoleToUser(@RequestBody AddRoleToUserDto addRoleToUserDto) throws ResponseStatusException {
+        userService.addRoleToUser(addRoleToUserDto.getUsername(), addRoleToUserDto.getRoleName());
         return ResponseEntity.ok().build();
     }
 
@@ -96,10 +96,4 @@ public class UserResource {
             throw new RuntimeException("Refresh token is missing");
         }
     }
-}
-
-@Data
-class RoleToUserForm {
-    private String username;
-    private String roleName;
 }

@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api;
+package com.zarszz.userservice.controller;
 
 import com.zarszz.userservice.requests.v1.message.NotificationMessageDto;
 import com.zarszz.userservice.service.NotificationService;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
-public class NotificationResource {
+public class NotificationController {
     @Autowired
     NotificationService notificationService;
 

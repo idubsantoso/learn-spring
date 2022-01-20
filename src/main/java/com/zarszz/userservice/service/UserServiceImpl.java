@@ -3,8 +3,8 @@ package com.zarszz.userservice.service;
 import com.zarszz.userservice.config.Config;
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;
-import com.zarszz.userservice.repo.RoleRepo;
-import com.zarszz.userservice.repo.UserRepo;
+import com.zarszz.userservice.repository.RoleRepository;
+import com.zarszz.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,8 +31,8 @@ import java.util.List;
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-    private final UserRepo userRepo;
-    private final RoleRepo roleRepo;
+    private final UserRepository userRepo;
+    private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
 
     @Override

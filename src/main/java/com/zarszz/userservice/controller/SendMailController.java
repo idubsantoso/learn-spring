@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api;
+package com.zarszz.userservice.controller;
 
 import com.zarszz.userservice.requests.v1.email.SendSecretCodeFromEmail;
 import com.zarszz.userservice.service.EmailSenderService;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/email/secret-code")
-public class SendMailResource {
+public class SendMailController {
 
     @Autowired
     EmailSenderService emailSenderService;

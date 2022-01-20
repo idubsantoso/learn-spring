@@ -7,7 +7,7 @@ import javax.transaction.Transactional;
 
 import com.zarszz.userservice.config.Config;
 import com.zarszz.userservice.domain.Product;
-import com.zarszz.userservice.repo.ProductRepo;
+import com.zarszz.userservice.repository.ProductRepository;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Slf4j
 public class ProductServiceImpl implements ProductService {
-    private final ProductRepo productRepo;
+    private final ProductRepository productRepo;
 
     @Override
     @CacheEvict(value = Config.ALL_PRODUCT, allEntries = true)
