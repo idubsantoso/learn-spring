@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api.exception;
+package com.zarszz.userservice.controller.exception;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;

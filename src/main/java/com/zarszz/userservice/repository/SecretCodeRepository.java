@@ -1,4 +1,4 @@
-package com.zarszz.userservice.repo;
+package com.zarszz.userservice.repository;
 
 import com.zarszz.userservice.domain.SecretCode;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +8,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
-public interface SecretCodeRepo extends JpaRepository<SecretCode, Long> {
+public interface SecretCodeRepository extends JpaRepository<SecretCode, Long> {
     public Optional<SecretCode> findByCodeAndEmail(String code, String email) throws NoSuchElementException;
 }

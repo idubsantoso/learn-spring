@@ -1,4 +1,4 @@
-package com.zarszz.userservice.api;
+package com.zarszz.userservice.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class ProductResource {
+public class ProductController {
 
     @Autowired
     private final ProductServiceImpl productService;
