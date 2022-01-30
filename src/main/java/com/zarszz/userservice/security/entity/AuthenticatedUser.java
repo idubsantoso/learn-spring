@@ -1,5 +1,6 @@
 package com.zarszz.userservice.security.entity;
 
+import com.zarszz.userservice.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,4 +15,5 @@ import org.springframework.web.context.annotation.RequestScope;
 public class AuthenticatedUser {
     private String username;
     private Long userId;
+    private User user;
 }

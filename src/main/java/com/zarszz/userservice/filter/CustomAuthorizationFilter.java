@@ -71,6 +71,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     var user = userService.getUser(username);
                     authenticatedUser.setUserId(user.getId());
                     authenticatedUser.setUsername(user.getUsername());
+                    authenticatedUser.setUser(user);
 
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
