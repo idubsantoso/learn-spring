@@ -3,11 +3,12 @@ package com.zarszz.userservice.domain;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "user_address")
 @Data
-public class UserAddress {
+public class UserAddress implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
