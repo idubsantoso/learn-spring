@@ -3,11 +3,14 @@ package com.zarszz.userservice.service;
 import com.zarszz.userservice.config.Config;
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;
+import com.zarszz.userservice.domain.projection.CurrentUserProjection;
 import com.zarszz.userservice.repository.RoleRepository;
 import com.zarszz.userservice.repository.UserRepository;
+import com.zarszz.userservice.security.entity.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private final AuthenticatedUser authenticatedUser;
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -59,6 +66,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public CurrentUserProjection getCurrentUser() {
+        // return userRepo.findCurrentUser(authenticatedUser.getUsername()).orElseThrow(() -> new NoSuchElementException("No User Found"));
+        return userRepo.findCurrentUser(authenticatedUser.getUsername());
+    }
+
+    @Override
     @CacheEvict(value = Config.ALL_USER, allEntries = true)
     public Role saveRole(Role role) {
         log.info("Saving new role {} to database", role.getName());
@@ -66,8 +79,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = Config.ALL_USER, allEntries = true),
-            @CacheEvict(value = Config.USER_STRING, key = "#username") })
+    @Caching(evict = {@CacheEvict(value = Config.ALL_USER, allEntries = true),
+            @CacheEvict(value = Config.USER_STRING, key = "#username")})
     public void addRoleToUser(String username, String roleName) throws ResponseStatusException {
         log.info("Adding role {} to user {}", roleName, username);
         User user = userRepo.findByUsername(username);
@@ -78,8 +91,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Caching(evict = { @CacheEvict(value = Config.ALL_USER, allEntries = true),
-            @CacheEvict(value = Config.USER_STRING, key = "#username") })
+    @Caching(evict = {@CacheEvict(value = Config.ALL_USER, allEntries = true),
+            @CacheEvict(value = Config.USER_STRING, key = "#username")})
     public User getUser(String username) {
         log.info("Fetching user {}", username);
         return userRepo.findByUsername(username);
