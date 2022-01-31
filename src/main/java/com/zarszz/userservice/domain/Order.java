@@ -26,7 +26,7 @@ public class Order implements Serializable  {
     private Integer qty;
 
     @Column(columnDefinition = "integer default 0")
-    private Integer subTotal;
+    private Long subTotal;
 
     @Column(columnDefinition = "text")
     private String comments;

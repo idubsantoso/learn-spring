@@ -4,9 +4,8 @@ import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.OrderItem;
 import com.zarszz.userservice.repository.OrderItemRepository;
 import com.zarszz.userservice.repository.OrderRepository;
-import com.zarszz.userservice.requests.v1.order.CreateOrderDto;
+import com.zarszz.userservice.requests.v1.order.OrderDto;
 import com.zarszz.userservice.requests.v1.order.OrderItemDto;
-import com.zarszz.userservice.requests.v1.order.UpdateOrderDto;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,27 +37,30 @@ public class OrderServiceImpl implements OrderService {
             propagation = Propagation.REQUIRED,
             isolation = Isolation.SERIALIZABLE
     )
-    public Order create(CreateOrderDto createOrderDto) throws NoSuchElementException {
+    public Order create(OrderDto createOrderDto) throws NoSuchElementException {
         var orderObj = new Order();
         orderObj.setUser(authenticatedUser.getUser());
         orderObj.setComments(createOrderDto.getComments());
         var createdOrder = orderRepository.save(orderObj);
 
         var orderItems = new ArrayList<OrderItem>();
-        int amount = 0;
+        long amount = 0L;
         int qty = 0;
 
 
         for (OrderItemDto item : createOrderDto.getProductsItems()) {
             var product = productService.get((long) item.getProductId());
             qty = qty + item.getQty();
-            amount = amount + (Integer.parseInt(product.getPrice()) * item.getQty());
+            amount = amount + (product.getPrice() * item.getQty());
 
             var orderItem = new OrderItem();
             orderItem.setOrder(createdOrder);
             orderItem.setProduct(product);
             orderItem.setQty(item.getQty());
             var createdOrderItem = orderItemRepository.save(orderItem);
+
+            product.setStock(product.getStock() - item.getQty());
+            productService.save(product);
 
             orderItems.add(createdOrderItem);
         }
@@ -89,21 +91,29 @@ public class OrderServiceImpl implements OrderService {
             propagation = Propagation.REQUIRED,
             isolation = Isolation.SERIALIZABLE
     )
-    public void update(UpdateOrderDto updateOrderDto, Long id) throws NoSuchElementException {
+    public void update(OrderDto updateOrderDto, Long id) throws NoSuchElementException {
         var orderObj = orderRepository.findById(id).orElseThrow(() -> new NoSuchElementException(("Order not found")));
         orderObj.setUser(authenticatedUser.getUser());
         orderObj.setComments(updateOrderDto.getComments());
 
         var orderItems = new ArrayList<OrderItem>();
-        int amount = 0;
+        var amount = 0L;
         int qty = 0;
 
         orderItemRepository.deleteByOrderId(orderObj.getId());
 
-        for (OrderItemDto item : updateOrderDto.getProductsItems()) {
+        var orders = orderItemRepository.findByOrderId(id);
+
+        for (var orderItem: orders) {
+            var product = orderItem.getProduct();
+            product.setStock(product.getStock() + orderItem.getQty());
+            productService.save(product);
+        }
+
+        for (var item : updateOrderDto.getProductsItems()) {
             var product = productService.get((long) item.getProductId());
             qty = qty + item.getQty();
-            amount = amount + (Integer.parseInt(product.getPrice()) * item.getQty());
+            amount = amount + (product.getPrice() * item.getQty());
 
             var orderItem = new OrderItem();
             orderItem.setOrder(orderObj);
