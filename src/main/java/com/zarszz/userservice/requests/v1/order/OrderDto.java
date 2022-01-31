@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 @Data
-public class UpdateOrderDto {
+public class OrderDto {
     @NotEmpty(message = "Order Item should not empty")
     @JsonProperty(value = "products_items")
     List<OrderItemDto> productsItems;

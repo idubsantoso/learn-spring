@@ -1,7 +1,6 @@
 package com.zarszz.userservice.controller;
 
-import com.zarszz.userservice.requests.v1.order.CreateOrderDto;
-import com.zarszz.userservice.requests.v1.order.UpdateOrderDto;
+import com.zarszz.userservice.requests.v1.order.OrderDto;
 import com.zarszz.userservice.service.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +28,13 @@ public class OrderController {
     }
 
     @PostMapping
-    ResponseEntity<?> create(@RequestBody @Valid CreateOrderDto createOrderDto) {
+    ResponseEntity<?> create(@RequestBody @Valid OrderDto createOrderDto) {
         var order = orderService.create(createOrderDto);
         return ResponseEntity.ok(order);
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> update(@RequestBody @Valid UpdateOrderDto updateOrderDto, @PathVariable("id") Long id) {
+    ResponseEntity<?> update(@RequestBody @Valid OrderDto updateOrderDto, @PathVariable("id") Long id) {
         orderService.update(updateOrderDto, id);
         return ResponseEntity.ok("Operation Success");
     }
