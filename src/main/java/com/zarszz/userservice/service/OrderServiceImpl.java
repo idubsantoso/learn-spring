@@ -2,6 +2,7 @@ package com.zarszz.userservice.service;
 
 import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.OrderItem;
+import com.zarszz.userservice.domain.enumData.OrderStatus;
 import com.zarszz.userservice.repository.OrderItemRepository;
 import com.zarszz.userservice.repository.OrderRepository;
 import com.zarszz.userservice.requests.v1.order.OrderDto;
@@ -28,6 +29,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     ProductServiceImpl productService;
+
+    @Autowired
+    UserAddressImpl userAddressService;
 
     @Autowired
     AuthenticatedUser authenticatedUser;
@@ -69,6 +73,14 @@ public class OrderServiceImpl implements OrderService {
         createdOrder.setQty(qty);
 
         createdOrder.setOrderItems(orderItems);
+
+        var userAddress = userAddressService.getById(createOrderDto.getOrderId());
+        var isAdmin = authenticatedUser.getUser().getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_SUPER_ADMIN"));
+        if ((!isAdmin) || userAddress.getUserId() != authenticatedUser.getUserId()){
+            throw new NoSuchElementException("User Address not found");
+        }
+        createdOrder.setUserAddress(userAddress);
+        createdOrder.setStatus(OrderStatus.PENDING);
 
         return orderRepository.save(createdOrder);
     }
@@ -126,6 +138,11 @@ public class OrderServiceImpl implements OrderService {
 
         orderObj.setSubTotal(amount);
         orderObj.setQty(qty);
+
+        var userAddress = userAddressService.getById(updateOrderDto.getOrderId());
+        var isAdmin = authenticatedUser.getUser().getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_SUPER_ADMIN"));
+        if ((!isAdmin) || userAddress.getUserId() != authenticatedUser.getUserId())
+            throw new NoSuchElementException("User Address not found");
 
         orderObj.setOrderItems(orderItems);
 

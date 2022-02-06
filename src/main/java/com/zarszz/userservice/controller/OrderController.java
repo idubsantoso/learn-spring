@@ -2,6 +2,7 @@ package com.zarszz.userservice.controller;
 
 import com.zarszz.userservice.requests.v1.order.OrderDto;
 import com.zarszz.userservice.service.OrderServiceImpl;
+import com.zarszz.userservice.service.PaymentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,9 @@ public class OrderController {
 
     @Autowired
     OrderServiceImpl orderService;
+
+    @Autowired
+    PaymentServiceImpl paymentService;
 
     @GetMapping
     ResponseEntity<?> get() {
@@ -30,6 +34,12 @@ public class OrderController {
     @PostMapping
     ResponseEntity<?> create(@RequestBody @Valid OrderDto createOrderDto) {
         var order = orderService.create(createOrderDto);
+        return ResponseEntity.ok(order);
+    }
+
+    @PostMapping("/{orderId}/payment/create")
+    ResponseEntity<?> proceed(@PathVariable("orderId") Long orderId) {
+        var order = paymentService.create(orderId);
         return ResponseEntity.ok(order);
     }
 

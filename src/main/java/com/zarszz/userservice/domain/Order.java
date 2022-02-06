@@ -1,6 +1,8 @@
 package com.zarszz.userservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.zarszz.userservice.domain.enumData.OrderStatus;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +33,13 @@ public class Order implements Serializable  {
     @Column(columnDefinition = "text")
     private String comments;
 
+    @Column(name = "status")
+    private OrderStatus status;
+
     @OneToMany(mappedBy = "order")
     List<OrderItem> orderItems;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private UserAddress userAddress;
 }
