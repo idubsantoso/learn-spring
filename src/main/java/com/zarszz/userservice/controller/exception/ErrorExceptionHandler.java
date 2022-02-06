@@ -3,6 +3,7 @@ package com.zarszz.userservice.controller.exception;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import com.zarszz.userservice.kernel.exception.AlreadyCreatedException;
 import com.zarszz.userservice.response.v1.exception.ErrorResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -33,6 +34,14 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
             NoSuchElementException exception,
             WebRequest request) {
         return buildErrorResponse(exception, HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler(AlreadyCreatedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handleAlreadyCreatedException(
+            AlreadyCreatedException exception,
+            WebRequest request) {
+        return buildErrorResponse(exception, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(Exception.class)
