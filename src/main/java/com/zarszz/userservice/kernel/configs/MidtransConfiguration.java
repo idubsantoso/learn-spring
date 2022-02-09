@@ -1,5 +1,6 @@
 package com.zarszz.userservice.kernel.configs;
 
+import com.midtrans.service.MidtransCoreApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,8 +22,14 @@ public class MidtransConfiguration {
     private String environment;
 
     @Bean
-    private MidtransSnapApi midtransSnapApi() {
+    MidtransSnapApi midtransSnapApi() {
         var isProduction = environment.equals("production");
         return new ConfigFactory(new Config(serverKey, clientKey, isProduction)).getSnapApi();
+    }
+
+    @Bean
+    MidtransCoreApi midtransCoreApi() {
+        var isProduction = environment.equals("production");
+        return new ConfigFactory(new Config(serverKey, clientKey, isProduction)).getCoreApi();
     }
 }

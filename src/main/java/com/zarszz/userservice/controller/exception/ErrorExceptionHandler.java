@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import com.zarszz.userservice.kernel.exception.AlreadyCreatedException;
+import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.response.v1.exception.ErrorResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -40,6 +41,14 @@ public class ErrorExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleAlreadyCreatedException(
             AlreadyCreatedException exception,
+            WebRequest request) {
+        return buildErrorResponse(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(PaymentErrorException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Object> handlePaymentErrorException(
+            PaymentErrorException exception,
             WebRequest request) {
         return buildErrorResponse(exception, HttpStatus.BAD_REQUEST, request);
     }

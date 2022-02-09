@@ -1,5 +1,6 @@
 package com.zarszz.userservice.controller;
 
+import com.midtrans.httpclient.error.MidtransError;
 import com.zarszz.userservice.requests.v1.order.OrderDto;
 import com.zarszz.userservice.service.OrderServiceImpl;
 import com.zarszz.userservice.service.PaymentServiceImpl;
@@ -38,7 +39,7 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/payment/create")
-    ResponseEntity<?> proceed(@PathVariable("orderId") Long orderId) {
+    ResponseEntity<?> proceed(@PathVariable("orderId") Long orderId) throws MidtransError {
         var order = paymentService.create(orderId);
         return ResponseEntity.ok(order);
     }

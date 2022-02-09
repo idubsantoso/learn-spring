@@ -32,6 +32,9 @@ public class Payment {
     private Long total;
 
     @Column
+    private String redirectUrl;
+
+    @Column
     private PaymentStatus status;
 
     @Column
