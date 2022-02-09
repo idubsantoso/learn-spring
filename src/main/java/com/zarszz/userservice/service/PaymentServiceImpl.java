@@ -1,18 +1,25 @@
 package com.zarszz.userservice.service;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.midtrans.httpclient.error.MidtransError;
+import com.midtrans.service.MidtransCoreApi;
+import com.midtrans.service.MidtransSnapApi;
 import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.domain.enumData.OrderStatus;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
 import com.zarszz.userservice.kernel.exception.AlreadyCreatedException;
+import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.repository.PaymentRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -31,12 +38,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     AuthenticatedUser authenticatedUser;
 
+    @Autowired
+    MidtransSnapApi midtransSnapApi;
+
+    @Autowired
+    MidtransCoreApi midtransCoreApi;
+
     @Override
     @Transactional(
             propagation = Propagation.REQUIRED,
             isolation = Isolation.SERIALIZABLE
     )
-    public Payment create(Long orderId) throws AlreadyCreatedException {
+    public Payment create(Long orderId) throws AlreadyCreatedException, MidtransError {
         if (paymentRepository.findByOrderId(orderId).isPresent())
             throw new AlreadyCreatedException("Order already created");
         var order = orderService.getById(orderId);
@@ -46,7 +59,20 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setOrder(order);
         payment.setStatus(PaymentStatus.PENDING);
         payment.setTotal(order.getSubTotal());
-        payment.setPaymentCode(RandomStringUtils.randomAlphanumeric(16).toUpperCase());
+        var paymentCode = "TRX" + RandomStringUtils.randomAlphanumeric(16).toUpperCase();
+        payment.setPaymentCode(paymentCode);
+
+        Map<String, Object> params = new HashMap<>();
+
+        Map<String, String> transactionDetails = new HashMap<>();
+        transactionDetails.put("order_id", paymentCode);
+        transactionDetails.put("gross_amount", payment.getTotal().toString());
+
+        params.put("transaction_details", transactionDetails);
+
+        var redirectUrl = midtransSnapApi.createTransactionRedirectUrl(params);
+
+        payment.setRedirectUrl(redirectUrl);
 
         return paymentRepository.save(payment);
     }
@@ -87,11 +113,44 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void proceed(Long id) throws NoSuchElementException {
-        // TODO !
-        // Create proceed payment dto
-        // Connect to payment gateway
-        // Set transaction state
-        // Update order state
+    public void proceed(Long id,  Map<String, Object> response) throws NoSuchElementException, MidtransError {
+        var payment = paymentRepository.findByOrderId(id).orElseThrow(() -> new NoSuchElementException("Payment not found"));
+        if (payment.getStatus().equals(PaymentStatus.EXPIRED))
+            throw new PaymentErrorException("Your payment is expired, please create someone new");
+        if (payment.getStatus().equals(PaymentStatus.COMPLETED))
+            throw new PaymentErrorException("Your payment is completed");
+        if (!(response.isEmpty())) {
+            //Get Order ID from notification body
+            String orderId = (String) response.get("order_id");
+
+            // Get status transaction to api with order id
+            JSONObject transactionResult = midtransCoreApi.checkTransaction(orderId);
+
+            String transactionStatus = (String) transactionResult.get("transaction_status");
+            String fraudStatus = (String) transactionResult.get("fraud_status");
+
+            var notificationResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus + ". Fraud status: " + fraudStatus;
+            System.out.println(notificationResponse);
+
+            switch (transactionStatus) {
+                case "capture":
+                    if (fraudStatus.equals("challenge")) {
+                        payment.setStatus(PaymentStatus.PENDING);
+                        throw new PaymentErrorException("Your payment is challenged");
+                    } else if (fraudStatus.equals("accept")) {
+                        payment.setStatus(PaymentStatus.COMPLETED);
+                    }
+                    break;
+                case "cancel":
+                case "deny":
+                case "expire":
+                    payment.setStatus(PaymentStatus.FAILED);
+                    throw new PaymentErrorException("Your payment is failed");
+                case "pending":
+                    payment.setStatus(PaymentStatus.PENDING);
+                    throw new PaymentErrorException("Your payment is pending");
+            }
+        }
+        paymentRepository.save(payment);
     }
 }
