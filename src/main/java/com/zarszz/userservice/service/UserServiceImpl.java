@@ -35,8 +35,13 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 
+    @Autowired
     private final UserRepository userRepo;
+
+    @Autowired
     private final RoleRepository roleRepo;
+
+    @Autowired
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
