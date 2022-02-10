@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
         var payment = paymentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Payment not found"));
         payment.setTotal(order.getSubTotal());
         paymentRepository.save(payment);
-        
+
     }
 
     @Override
@@ -101,7 +101,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!paymentRepository.existsById(id))
             throw new NoSuchElementException("Payment not found");
         paymentRepository.deleteById(id);
-        
+
     }
 
     @Override
@@ -114,9 +114,10 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError {
+        System.out.println(response);
         if (!(response.isEmpty())) {
             //Get Order ID from notification body
-            String orderId = (String) response.get("order_id");
+            var orderId = response.containsKey("order_id") ? (String) response.get("order_id") : "";
 
             var payment = paymentRepository.findByPaymentCode(orderId).orElseThrow(() -> new NoSuchElementException("Payment not found"));
             if (payment.getStatus().equals(PaymentStatus.EXPIRED))
@@ -125,10 +126,10 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new PaymentErrorException("Your payment is completed");
 
             // Get status transaction to api with order id
-            JSONObject transactionResult = midtransCoreApi.checkTransaction(orderId);
-
-            String transactionStatus = (String) transactionResult.get("transaction_status");
-            String fraudStatus = (String) transactionResult.get("fraud_status");
+            var transactionResult = midtransCoreApi.checkTransaction(orderId);
+            System.out.println(transactionResult);
+            var transactionStatus = transactionResult.has("transaction_status") ? (String) transactionResult.get("transaction_status") : "";
+            var fraudStatus = transactionResult.has("fraud_status") ? (String) transactionResult.get("fraud_status") : "";
 
             var notificationResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus + ". Fraud status: " + fraudStatus;
             System.out.println(notificationResponse);
