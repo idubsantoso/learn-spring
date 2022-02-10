@@ -25,7 +25,7 @@ public class OrderItem implements Serializable {
     Product product;
 
     @ManyToOne()
-    @JoinColumn(name = "order_id")
+    @JoinColumn(columnDefinition="bigint", name = "order_id")
     @JsonIgnore
     Order order;
 

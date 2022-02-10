@@ -21,7 +21,7 @@ public class Order implements Serializable  {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(columnDefinition="bigint", name = "user_id")
     @JsonIgnore
     private User user;
 
@@ -41,6 +41,6 @@ public class Order implements Serializable  {
     List<OrderItem> orderItems;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    @JoinColumn(columnDefinition="integer", name = "address_id", referencedColumnName = "id")
     private UserAddress userAddress;
 }
