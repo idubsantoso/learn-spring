@@ -21,7 +21,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @AllArgsConstructor
 public class Product implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     Long id;
 
     @Column

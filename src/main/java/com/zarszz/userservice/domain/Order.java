@@ -16,7 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class Order implements Serializable  {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(columnDefinition = "serial")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
