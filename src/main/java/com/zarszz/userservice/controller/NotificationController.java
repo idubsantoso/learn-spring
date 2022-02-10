@@ -35,9 +35,9 @@ public class NotificationController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping(path = "api/notifications/midtrans/payments/{id}/proceed", consumes = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> handleNotification(@RequestBody Map<String, Object> response, @PathVariable("id") Long id) throws Exception {
-        paymentService.proceed(id, response);
+    @PostMapping(path = "api/notifications/midtrans/payments/proceed", consumes = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity<String> handleNotification(@RequestBody Map<String, Object> response) throws Exception {
+        paymentService.proceed(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

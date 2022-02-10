@@ -113,15 +113,16 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void proceed(Long id,  Map<String, Object> response) throws NoSuchElementException, MidtransError {
-        var payment = paymentRepository.findByOrderId(id).orElseThrow(() -> new NoSuchElementException("Payment not found"));
-        if (payment.getStatus().equals(PaymentStatus.EXPIRED))
-            throw new PaymentErrorException("Your payment is expired, please create someone new");
-        if (payment.getStatus().equals(PaymentStatus.COMPLETED))
-            throw new PaymentErrorException("Your payment is completed");
+    public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError {
         if (!(response.isEmpty())) {
             //Get Order ID from notification body
             String orderId = (String) response.get("order_id");
+
+            var payment = paymentRepository.findByPaymentCode(orderId).orElseThrow(() -> new NoSuchElementException("Payment not found"));
+            if (payment.getStatus().equals(PaymentStatus.EXPIRED))
+                throw new PaymentErrorException("Your payment is expired, please create someone new");
+            if (payment.getStatus().equals(PaymentStatus.COMPLETED))
+                throw new PaymentErrorException("Your payment is completed");
 
             // Get status transaction to api with order id
             JSONObject transactionResult = midtransCoreApi.checkTransaction(orderId);
@@ -150,7 +151,7 @@ public class PaymentServiceImpl implements PaymentService {
                     payment.setStatus(PaymentStatus.PENDING);
                     throw new PaymentErrorException("Your payment is pending");
             }
+            paymentRepository.save(payment);
         }
-        paymentRepository.save(payment);
     }
 }

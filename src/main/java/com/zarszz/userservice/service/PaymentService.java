@@ -16,5 +16,5 @@ public interface PaymentService {
     void update(Order order, Long id) throws NoSuchElementException;
     void delete(Long id) throws NoSuchElementException;
     void cancel(Long id) throws NoSuchElementException;
-    void proceed(Long id, Map<String, Object> response) throws NoSuchElementException, MidtransError;
+    void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError;
 }
