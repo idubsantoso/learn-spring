@@ -18,6 +18,7 @@ import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.repository.PaymentRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
@@ -114,7 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError {
-        System.out.println(response);
+        log.info(response.toString());
         if (!(response.isEmpty())) {
             //Get Order ID from notification body
             var orderId = response.containsKey("order_id") ? (String) response.get("order_id") : "";
@@ -127,12 +129,12 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Get status transaction to api with order id
             var transactionResult = midtransCoreApi.checkTransaction(orderId);
-            System.out.println(transactionResult);
+            log.info(transactionResult.toString());
             var transactionStatus = transactionResult.has("transaction_status") ? (String) transactionResult.get("transaction_status") : "";
             var fraudStatus = transactionResult.has("fraud_status") ? (String) transactionResult.get("fraud_status") : "";
 
             var notificationResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus + ". Fraud status: " + fraudStatus;
-            System.out.println(notificationResponse);
+            log.info(notificationResponse);
 
             switch (transactionStatus) {
                 case "capture":
