@@ -1,6 +1,7 @@
 package com.zarszz.userservice.controller;
 
 import com.midtrans.httpclient.error.MidtransError;
+import com.zarszz.userservice.kernel.configs.kafka.KafkaSenderExample;
 import com.zarszz.userservice.requests.v1.message.NotificationMessageDto;
 import com.zarszz.userservice.service.NotificationService;
 
@@ -27,6 +28,9 @@ public class NotificationController {
     @Autowired
     PaymentService paymentService;
 
+    @Autowired
+    KafkaSenderExample kafkaSenderExample;
+
     @PostMapping(path = "api/notifications/send", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> sendNotification(@RequestBody NotificationMessageDto notificationMessage) {
         String result = this.notificationService.sendNotificationRestTemplate(notificationMessage);
@@ -38,6 +42,12 @@ public class NotificationController {
     @PostMapping(path = "api/notifications/midtrans/payments/proceed", consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> handleNotification(@RequestBody Map<String, Object> response) throws Exception {
         paymentService.proceed(response);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "api/notifications/kafka", consumes = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity<String> handleKafkaNotification(@RequestBody Map<String, Object> request) throws Exception {
+        kafkaSenderExample.sendMessage(request.get("reflectoring").toString(), request.get("topic_name").toString());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
