@@ -18,6 +18,7 @@ import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.repository.PaymentRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
@@ -93,7 +95,7 @@ public class PaymentServiceImpl implements PaymentService {
         var payment = paymentRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Payment not found"));
         payment.setTotal(order.getSubTotal());
         paymentRepository.save(payment);
-        
+
     }
 
     @Override
@@ -101,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (!paymentRepository.existsById(id))
             throw new NoSuchElementException("Payment not found");
         paymentRepository.deleteById(id);
-        
+
     }
 
     @Override
@@ -113,24 +115,26 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void proceed(Long id,  Map<String, Object> response) throws NoSuchElementException, MidtransError {
-        var payment = paymentRepository.findByOrderId(id).orElseThrow(() -> new NoSuchElementException("Payment not found"));
-        if (payment.getStatus().equals(PaymentStatus.EXPIRED))
-            throw new PaymentErrorException("Your payment is expired, please create someone new");
-        if (payment.getStatus().equals(PaymentStatus.COMPLETED))
-            throw new PaymentErrorException("Your payment is completed");
+    public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError {
+        log.info(response.toString());
         if (!(response.isEmpty())) {
             //Get Order ID from notification body
-            String orderId = (String) response.get("order_id");
+            var orderId = response.containsKey("order_id") ? (String) response.get("order_id") : "";
+
+            var payment = paymentRepository.findByPaymentCode(orderId).orElseThrow(() -> new NoSuchElementException("Payment not found"));
+            if (payment.getStatus().equals(PaymentStatus.EXPIRED))
+                throw new PaymentErrorException("Your payment is expired, please create someone new");
+            if (payment.getStatus().equals(PaymentStatus.COMPLETED))
+                throw new PaymentErrorException("Your payment is completed");
 
             // Get status transaction to api with order id
-            JSONObject transactionResult = midtransCoreApi.checkTransaction(orderId);
-
-            String transactionStatus = (String) transactionResult.get("transaction_status");
-            String fraudStatus = (String) transactionResult.get("fraud_status");
+            var transactionResult = midtransCoreApi.checkTransaction(orderId);
+            log.info(transactionResult.toString());
+            var transactionStatus = transactionResult.has("transaction_status") ? (String) transactionResult.get("transaction_status") : "";
+            var fraudStatus = transactionResult.has("fraud_status") ? (String) transactionResult.get("fraud_status") : "";
 
             var notificationResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus + ". Fraud status: " + fraudStatus;
-            System.out.println(notificationResponse);
+            log.info(notificationResponse);
 
             switch (transactionStatus) {
                 case "capture":
@@ -150,7 +154,7 @@ public class PaymentServiceImpl implements PaymentService {
                     payment.setStatus(PaymentStatus.PENDING);
                     throw new PaymentErrorException("Your payment is pending");
             }
+            paymentRepository.save(payment);
         }
-        paymentRepository.save(payment);
     }
 }

@@ -34,6 +34,7 @@ public class Order implements Serializable  {
     @Column(columnDefinition = "text")
     private String comments;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name = "status")
     private OrderStatus status;
 
