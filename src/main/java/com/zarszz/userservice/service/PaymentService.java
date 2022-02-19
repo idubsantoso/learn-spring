@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public interface PaymentService {
-    Payment create(Long orderId) throws DuplicateKeyException, MidtransError;
+    void create(Long orderId) throws DuplicateKeyException, MidtransError;
+    void save(Payment payment);
     List<Payment> get();
     Payment getById(Long id) throws NoSuchElementException;
     void update(Order order, Long id) throws NoSuchElementException;
