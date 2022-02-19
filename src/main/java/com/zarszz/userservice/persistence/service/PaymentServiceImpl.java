@@ -1,4 +1,4 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 
 import java.util.HashMap;
@@ -9,22 +9,19 @@ import java.util.NoSuchElementException;
 import com.google.gson.Gson;
 import com.midtrans.httpclient.error.MidtransError;
 import com.midtrans.service.MidtransCoreApi;
-import com.midtrans.service.MidtransSnapApi;
 import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.domain.enumData.OrderStatus;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
-import com.zarszz.userservice.kernel.configs.rabbitmq.RabbitMqSender;
+import com.zarszz.userservice.utility.rabbitmq.RabbitMqSender;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.JobPurpose;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.kernel.exception.AlreadyCreatedException;
 import com.zarszz.userservice.kernel.exception.PaymentErrorException;
-import com.zarszz.userservice.repository.PaymentRepository;
+import com.zarszz.userservice.persistence.repository.PaymentRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;

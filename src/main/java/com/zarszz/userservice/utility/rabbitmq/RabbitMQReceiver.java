@@ -1,14 +1,13 @@
-package com.zarszz.userservice.kernel.configs.rabbitmq;
+package com.zarszz.userservice.utility.rabbitmq;
 
 import com.google.gson.Gson;
 import com.midtrans.service.MidtransSnapApi;
-import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.requests.v1.email.SendSecretCodeFromEmail;
 import com.zarszz.userservice.requests.v1.message.NotificationMessageDto;
-import com.zarszz.userservice.service.EmailSenderService;
-import com.zarszz.userservice.service.NotificationServiceImpl;
-import com.zarszz.userservice.service.PaymentServiceImpl;
+import com.zarszz.userservice.persistence.service.EmailSenderService;
+import com.zarszz.userservice.persistence.service.NotificationServiceImpl;
+import com.zarszz.userservice.persistence.service.PaymentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

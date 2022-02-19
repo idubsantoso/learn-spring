@@ -1,10 +1,10 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.OrderItem;
 import com.zarszz.userservice.domain.enumData.OrderStatus;
-import com.zarszz.userservice.repository.OrderItemRepository;
-import com.zarszz.userservice.repository.OrderRepository;
+import com.zarszz.userservice.persistence.repository.OrderItemRepository;
+import com.zarszz.userservice.persistence.repository.OrderRepository;
 import com.zarszz.userservice.requests.v1.order.OrderDto;
 import com.zarszz.userservice.requests.v1.order.OrderItemDto;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;

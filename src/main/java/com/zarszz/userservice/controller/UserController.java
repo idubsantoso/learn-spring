@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;
 import com.zarszz.userservice.requests.v1.role.AddRoleToUserDto;
-import com.zarszz.userservice.service.UserService;
+import com.zarszz.userservice.persistence.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;

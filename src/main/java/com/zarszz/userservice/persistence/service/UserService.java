@@ -1,4 +1,4 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;

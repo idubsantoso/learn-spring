@@ -1,6 +1,6 @@
-package com.zarszz.userservice.config;
+package com.zarszz.userservice.kernel.configs.constant;
 
-public class Config {
+public class Cache {
     public static final String USER_STRING = "USER_CACHE";
     public static final String ALL_USER = "ALL_USER_CACHE";
 

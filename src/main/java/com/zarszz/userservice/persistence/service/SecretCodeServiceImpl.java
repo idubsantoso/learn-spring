@@ -1,7 +1,7 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 import com.zarszz.userservice.domain.SecretCode;
-import com.zarszz.userservice.repository.SecretCodeRepository;
+import com.zarszz.userservice.persistence.repository.SecretCodeRepository;
 import com.zarszz.userservice.requests.v1.email.SendSecretCodeFromEmail;
 import com.zarszz.userservice.requests.v1.email.ValidateSecretCodeDto;
 import org.springframework.beans.factory.annotation.Autowired;

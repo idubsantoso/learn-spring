@@ -1,7 +1,7 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
 import com.zarszz.userservice.domain.UserAddress;
-import com.zarszz.userservice.repository.UserAddressRepository;
+import com.zarszz.userservice.persistence.repository.UserAddressRepository;
 import com.zarszz.userservice.requests.v1.useraddress.CreateUserAddressDto;
 import com.zarszz.userservice.requests.v1.useraddress.UpdateUserAddressDto;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class UserAddressImpl implements UserAddressService {

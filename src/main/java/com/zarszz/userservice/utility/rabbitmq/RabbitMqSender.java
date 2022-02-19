@@ -1,4 +1,4 @@
-package com.zarszz.userservice.kernel.configs.rabbitmq;
+package com.zarszz.userservice.utility.rabbitmq;
 
 import com.zarszz.userservice.domain.User;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;

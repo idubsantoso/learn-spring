@@ -1,6 +1,6 @@
 package com.zarszz.userservice.controller;
 
-import com.zarszz.userservice.service.PaymentServiceImpl;
+import com.zarszz.userservice.persistence.service.PaymentServiceImpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
