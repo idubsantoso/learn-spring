@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import com.google.gson.Gson;
 import com.midtrans.httpclient.error.MidtransError;
 import com.midtrans.service.MidtransCoreApi;
 import com.midtrans.service.MidtransSnapApi;
@@ -13,6 +14,9 @@ import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.domain.enumData.OrderStatus;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
+import com.zarszz.userservice.kernel.configs.rabbitmq.RabbitMqSender;
+import com.zarszz.userservice.kernel.configs.rabbitmq.dto.JobPurpose;
+import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.kernel.exception.AlreadyCreatedException;
 import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.repository.PaymentRepository;
@@ -41,17 +45,20 @@ public class PaymentServiceImpl implements PaymentService {
     AuthenticatedUser authenticatedUser;
 
     @Autowired
-    MidtransSnapApi midtransSnapApi;
+    MidtransCoreApi midtransCoreApi;
 
     @Autowired
-    MidtransCoreApi midtransCoreApi;
+    RabbitMqSender rabbitMqSender;
+
+    @Autowired
+    Gson gson;
 
     @Override
     @Transactional(
             propagation = Propagation.REQUIRED,
             isolation = Isolation.SERIALIZABLE
     )
-    public Payment create(Long orderId) throws AlreadyCreatedException, MidtransError {
+    public void create(Long orderId) throws AlreadyCreatedException, MidtransError {
         if (paymentRepository.findByOrderId(orderId).isPresent())
             throw new AlreadyCreatedException("Order already created");
         var order = orderService.getById(orderId);
@@ -61,22 +68,18 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setOrder(order);
         payment.setStatus(PaymentStatus.PENDING);
         payment.setTotal(order.getSubTotal());
-        var paymentCode = "TRX" + RandomStringUtils.randomAlphanumeric(16).toUpperCase();
-        payment.setPaymentCode(paymentCode);
+        var createdPayment = paymentRepository.save(payment);
+        var message = new Message();
+        var identity = new HashMap<>();
+        identity.put("id", createdPayment.getId().toString());
+        message.setPurpose(JobPurpose.CREATE_MIDTRANS_PAYMENT);
+        message.setMessage(gson.toJson(identity));
+        rabbitMqSender.send(message);
+    }
 
-        Map<String, Object> params = new HashMap<>();
-
-        Map<String, String> transactionDetails = new HashMap<>();
-        transactionDetails.put("order_id", paymentCode);
-        transactionDetails.put("gross_amount", payment.getTotal().toString());
-
-        params.put("transaction_details", transactionDetails);
-
-        var redirectUrl = midtransSnapApi.createTransactionRedirectUrl(params);
-
-        payment.setRedirectUrl(redirectUrl);
-
-        return paymentRepository.save(payment);
+    @Override
+    public void save(Payment payment) {
+        paymentRepository.save(payment);
     }
 
     @Override

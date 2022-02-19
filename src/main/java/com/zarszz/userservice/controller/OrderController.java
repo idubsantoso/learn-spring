@@ -41,8 +41,8 @@ public class OrderController {
 
     @PostMapping("/{orderId}/payment/create")
     ResponseEntity<?> proceed(@PathVariable("orderId") Long orderId) throws MidtransError {
-        var order = paymentService.create(orderId);
-        return ResponseEntity.ok(order);
+        paymentService.create(orderId);
+        return ResponseEntity.ok("ok");
     }
 
     @PutMapping("/{id}")
