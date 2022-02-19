@@ -5,7 +5,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.zarszz.userservice.domain.Product;
-import com.zarszz.userservice.service.ProductServiceImpl;
+import com.zarszz.userservice.persistence.service.ProductServiceImpl;
 
 import com.zarszz.userservice.requests.v1.product.CreateProductDto;
 

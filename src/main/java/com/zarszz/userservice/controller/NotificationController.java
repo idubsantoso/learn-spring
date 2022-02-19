@@ -1,24 +1,19 @@
 package com.zarszz.userservice.controller;
 
 import com.google.gson.Gson;
-import com.midtrans.httpclient.error.MidtransError;
 import com.zarszz.userservice.domain.User;
-import com.zarszz.userservice.kernel.configs.rabbitmq.RabbitMqSender;
+import com.zarszz.userservice.utility.rabbitmq.RabbitMqSender;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.JobPurpose;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.requests.v1.message.NotificationMessageDto;
-import com.zarszz.userservice.service.NotificationService;
 
-import com.zarszz.userservice.service.PaymentService;
-import org.json.JSONObject;
+import com.zarszz.userservice.persistence.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 

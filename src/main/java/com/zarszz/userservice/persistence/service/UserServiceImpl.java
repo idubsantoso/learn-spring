@@ -1,11 +1,11 @@
-package com.zarszz.userservice.service;
+package com.zarszz.userservice.persistence.service;
 
-import com.zarszz.userservice.config.Config;
+import com.zarszz.userservice.kernel.configs.constant.Cache;
 import com.zarszz.userservice.domain.Role;
 import com.zarszz.userservice.domain.User;
 import com.zarszz.userservice.domain.projection.CurrentUserProjection;
-import com.zarszz.userservice.repository.RoleRepository;
-import com.zarszz.userservice.repository.UserRepository;
+import com.zarszz.userservice.persistence.repository.RoleRepository;
+import com.zarszz.userservice.persistence.repository.UserRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,6 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @CacheEvict(value = Config.ALL_USER, allEntries = true)
+    @CacheEvict(value = Cache.ALL_USER, allEntries = true)
     public User saveUser(User user) {
         log.info("Saving new user {} to database", user.getName());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -77,15 +76,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @CacheEvict(value = Config.ALL_USER, allEntries = true)
+    @CacheEvict(value = Cache.ALL_USER, allEntries = true)
     public Role saveRole(Role role) {
         log.info("Saving new role {} to database", role.getName());
         return roleRepo.save(role);
     }
 
     @Override
-    @Caching(evict = {@CacheEvict(value = Config.ALL_USER, allEntries = true),
-            @CacheEvict(value = Config.USER_STRING, key = "#username")})
+    @Caching(evict = {@CacheEvict(value = Cache.ALL_USER, allEntries = true),
+            @CacheEvict(value = Cache.USER_STRING, key = "#username")})
     public void addRoleToUser(String username, String roleName) throws ResponseStatusException {
         log.info("Adding role {} to user {}", roleName, username);
         User user = userRepo.findByUsername(username);
@@ -96,15 +95,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    @Caching(evict = {@CacheEvict(value = Config.ALL_USER, allEntries = true),
-            @CacheEvict(value = Config.USER_STRING, key = "#username")})
+    @Caching(evict = {@CacheEvict(value = Cache.ALL_USER, allEntries = true),
+            @CacheEvict(value = Cache.USER_STRING, key = "#username")})
     public User getUser(String username) {
         log.info("Fetching user {}", username);
         return userRepo.findByUsername(username);
     }
 
     @Override
-    @Cacheable(value = Config.ALL_USER, keyGenerator = Config.GENERATOR_CACHE_KEY)
+    @Cacheable(value = Cache.ALL_USER, keyGenerator = Cache.GENERATOR_CACHE_KEY)
     public List<User> getUsers() {
         return userRepo.findAll();
     }

@@ -1,11 +1,10 @@
 package com.zarszz.userservice.controller;
 
 import com.google.gson.Gson;
-import com.zarszz.userservice.kernel.configs.rabbitmq.RabbitMqSender;
+import com.zarszz.userservice.utility.rabbitmq.RabbitMqSender;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.JobPurpose;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.requests.v1.email.SendSecretCodeFromEmail;
-import com.zarszz.userservice.service.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

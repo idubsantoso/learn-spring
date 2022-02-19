@@ -2,8 +2,8 @@ package com.zarszz.userservice.controller;
 
 import com.midtrans.httpclient.error.MidtransError;
 import com.zarszz.userservice.requests.v1.order.OrderDto;
-import com.zarszz.userservice.service.OrderServiceImpl;
-import com.zarszz.userservice.service.PaymentServiceImpl;
+import com.zarszz.userservice.persistence.service.OrderServiceImpl;
+import com.zarszz.userservice.persistence.service.PaymentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

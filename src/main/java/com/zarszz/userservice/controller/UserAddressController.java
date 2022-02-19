@@ -2,7 +2,7 @@ package com.zarszz.userservice.controller;
 
 import com.zarszz.userservice.requests.v1.useraddress.CreateUserAddressDto;
 import com.zarszz.userservice.requests.v1.useraddress.UpdateUserAddressDto;
-import com.zarszz.userservice.service.UserAddressService;
+import com.zarszz.userservice.persistence.service.UserAddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

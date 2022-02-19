@@ -1,4 +1,4 @@
-package com.zarszz.userservice.repository;
+package com.zarszz.userservice.persistence.repository;
 
 import com.zarszz.userservice.domain.projection.CurrentUserProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
