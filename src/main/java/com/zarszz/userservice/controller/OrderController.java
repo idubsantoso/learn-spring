@@ -23,20 +23,17 @@ public class OrderController {
 
     @GetMapping
     ResponseEntity<?> get() {
-        var orders = orderService.get();
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orderService.get());
     }
 
     @GetMapping("/{id}")
     ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        var order = orderService.getById(id);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(orderService.getById(id));
     }
 
     @PostMapping
     ResponseEntity<?> create(@RequestBody @Valid OrderDto createOrderDto) {
-        var order = orderService.create(createOrderDto);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(orderService.create(createOrderDto));
     }
 
     @PostMapping("/{orderId}/payment/create")

@@ -71,7 +71,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public CurrentUserProjection getCurrentUser() {
-        // return userRepo.findCurrentUser(authenticatedUser.getUsername()).orElseThrow(() -> new NoSuchElementException("No User Found"));
         return userRepo.findCurrentUser(authenticatedUser.getUsername());
     }
 
