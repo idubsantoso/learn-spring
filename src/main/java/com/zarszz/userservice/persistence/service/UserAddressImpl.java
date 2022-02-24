@@ -38,8 +38,7 @@ public class UserAddressImpl implements UserAddressService {
 
     @Override
     public UserAddress getById(Long id) throws NoSuchElementException {
-        var userAddress =  userAddressRepository.findById(id);
-        return userAddress.orElseThrow(() -> new NoSuchElementException("Address Not Found"));
+        return userAddressRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Address Not Found"));
     }
 
     @Override

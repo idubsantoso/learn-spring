@@ -18,26 +18,24 @@ public class UserAddressController {
     UserAddressService userAddressService;
 
     @PostMapping
-    ResponseEntity<?> create(@RequestBody @Valid CreateUserAddressDto createUserAddressDto) throws Exception{
+    ResponseEntity<?> create(@RequestBody @Valid CreateUserAddressDto createUserAddressDto) throws Exception {
         userAddressService.create(createUserAddressDto);
         return ResponseEntity.ok("Request success");
     }
 
     @GetMapping
     ResponseEntity<?> get() {
-        var address = userAddressService.get();
-        return ResponseEntity.ok(address);
+        return ResponseEntity.ok(userAddressService.get());
     }
 
     @GetMapping("/{id}")
     ResponseEntity<?> getById(@PathVariable("id") Long id) {
-        var address = userAddressService.getById(id);
-        return ResponseEntity.ok(address);
+        return ResponseEntity.ok(userAddressService.getById(id));
     }
 
     @PutMapping("/{id}")
     ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody @Valid UpdateUserAddressDto updateUserAddressDto) {
-         userAddressService.update(updateUserAddressDto, id);
+        userAddressService.update(updateUserAddressDto, id);
         return ResponseEntity.ok("Request success");
     }
 
