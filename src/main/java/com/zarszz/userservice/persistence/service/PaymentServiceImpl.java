@@ -149,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
                 case "settlement":
                     if (fraudStatus.equals("challenge")) {
                         payment.setStatus(PaymentStatus.PENDING);
-                        throw new PaymentErrorException("Your payment is challenged");
+                        sendTransactionEmailMessage.setState("PENDING");
                     } else if (fraudStatus.equals("accept")) {
                         sendTransactionEmailMessage.setState("BERHASIL");
                         payment.setStatus(PaymentStatus.COMPLETED);
@@ -160,11 +160,9 @@ public class PaymentServiceImpl implements PaymentService {
                 case "expire":
                     payment.setStatus(PaymentStatus.FAILED);
                     sendTransactionEmailMessage.setState("GAGAL");
-                    throw new PaymentErrorException("Your payment is failed");
                 case "pending":
                     payment.setStatus(PaymentStatus.PENDING);
                     sendTransactionEmailMessage.setState("PENDING");
-                    throw new PaymentErrorException("Your payment is pending");
             }
 
             var message = new Message();
