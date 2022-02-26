@@ -101,7 +101,7 @@ public class EmailSenderService {
         message.setTo(recipientEmail);
 
         // Create the HTML body using Thymeleaf
-        final String htmlContent = this.emailTemplateEngine.process("process-payment.html", ctx);
+        final String htmlContent = this.emailTemplateEngine.process("transaction-status.html", ctx);
         message.setText(htmlContent, true); // true = isHtml
 
         // Send mail
