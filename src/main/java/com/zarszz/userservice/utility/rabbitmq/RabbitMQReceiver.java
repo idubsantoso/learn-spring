@@ -8,6 +8,7 @@ import com.zarszz.userservice.requests.v1.message.NotificationMessageDto;
 import com.zarszz.userservice.persistence.service.EmailSenderService;
 import com.zarszz.userservice.persistence.service.NotificationServiceImpl;
 import com.zarszz.userservice.persistence.service.PaymentServiceImpl;
+import com.zarszz.userservice.utility.rabbitmq.dto.SendTransactionStatusEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -57,6 +58,14 @@ public class RabbitMQReceiver implements RabbitListenerConfigurer {
                 var sendSecretCodeFromEmail = gson.fromJson(message.getMessage(), SendSecretCodeFromEmail.class);
                 emailSenderService.sendMailWithInline(
                         sendSecretCodeFromEmail.getRecipientName(), sendSecretCodeFromEmail.getRecipientEmail());
+                break;
+            case SEND_TRANSACTION_STATUS_EMAIL:
+                log.info("Purpose : SEND_TRANSACTION_STATUS_EMAIL, received message : {}", message.getMessage());
+                var sendTransactionStatusEmail = gson.fromJson(message.getMessage(), SendTransactionStatusEmail.class);
+                var paymentEmail = paymentService.getById(sendTransactionStatusEmail.getPaymentId());
+                emailSenderService.sendTransactionStatusEmail(
+                        sendTransactionStatusEmail.getRecipientEmail(),
+                        sendTransactionStatusEmail.getState(), paymentEmail);
                 break;
             case PROCESS_PAYMENT:
                 log.info("Purpose : PROCESS_PAYMENT, received message : {}", message.getMessage());

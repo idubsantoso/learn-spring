@@ -84,6 +84,30 @@ public class EmailSenderService {
         this.mailSender.send(mimeMessage);
     }
 
+    public void sendTransactionStatusEmail(final String recipientEmail, final String state, final Payment payment) throws MessagingException {
+        // Prepare the evaluation context
+        final Context ctx = new Context();
+        ctx.setVariable("name", payment.getUser().getName());
+        ctx.setVariable("total", payment.getTotal());
+        ctx.setVariable("state", state);
+        ctx.setVariable("paymentCode", payment.getPaymentCode());
+
+        // Prepare message using a Spring helper
+        final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+        final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+
+        message.setSubject("Pemberitahuan status transaksi");
+        message.setFrom(emailSource);
+        message.setTo(recipientEmail);
+
+        // Create the HTML body using Thymeleaf
+        final String htmlContent = this.emailTemplateEngine.process("process-payment.html", ctx);
+        message.setText(htmlContent, true); // true = isHtml
+
+        // Send mail
+        this.mailSender.send(mimeMessage);
+    }
+
     private String generateSecretCode() {
         Random rnd = new Random();
         return String.format("%06d", rnd.nextInt(999999));

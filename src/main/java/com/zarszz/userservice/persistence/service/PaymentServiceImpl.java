@@ -21,12 +21,15 @@ import com.zarszz.userservice.kernel.exception.PaymentErrorException;
 import com.zarszz.userservice.persistence.repository.PaymentRepository;
 import com.zarszz.userservice.security.entity.AuthenticatedUser;
 
+import com.zarszz.userservice.utility.rabbitmq.dto.SendTransactionStatusEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
 
 @Service
 @Slf4j
@@ -115,7 +118,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError {
+    public void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError, MessagingException {
         log.info(response.toString());
         if (!(response.isEmpty())) {
             //Get Order ID from notification body
@@ -136,12 +139,19 @@ public class PaymentServiceImpl implements PaymentService {
             var notificationResponse = "Transaction notification received. Order ID: " + orderId + ". Transaction status: " + transactionStatus + ". Fraud status: " + fraudStatus;
             log.info(notificationResponse);
 
+            var sendTransactionEmailMessage = new SendTransactionStatusEmail();
+            sendTransactionEmailMessage.setPaymentId(payment.getId());
+            sendTransactionEmailMessage.setRecipientEmail("ngaco@email.com");
+
             switch (transactionStatus) {
                 case "capture":
+                case "":
+                case "settlement":
                     if (fraudStatus.equals("challenge")) {
                         payment.setStatus(PaymentStatus.PENDING);
                         throw new PaymentErrorException("Your payment is challenged");
                     } else if (fraudStatus.equals("accept")) {
+                        sendTransactionEmailMessage.setState("BERHASIL");
                         payment.setStatus(PaymentStatus.COMPLETED);
                     }
                     break;
@@ -149,11 +159,19 @@ public class PaymentServiceImpl implements PaymentService {
                 case "deny":
                 case "expire":
                     payment.setStatus(PaymentStatus.FAILED);
+                    sendTransactionEmailMessage.setState("GAGAL");
                     throw new PaymentErrorException("Your payment is failed");
                 case "pending":
                     payment.setStatus(PaymentStatus.PENDING);
+                    sendTransactionEmailMessage.setState("PENDING");
                     throw new PaymentErrorException("Your payment is pending");
             }
+
+            var message = new Message();
+            message.setMessage(gson.toJson(sendTransactionEmailMessage));
+            message.setPurpose(JobPurpose.SEND_TRANSACTION_STATUS_EMAIL);
+            rabbitMqSender.send(message);
+
             paymentRepository.save(payment);
         }
     }

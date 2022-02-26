@@ -5,6 +5,7 @@ import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.Payment;
 import org.springframework.dao.DuplicateKeyException;
 
+import javax.mail.MessagingException;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -17,5 +18,5 @@ public interface PaymentService {
     void update(Order order, Long id) throws NoSuchElementException;
     void delete(Long id) throws NoSuchElementException;
     void cancel(Long id) throws NoSuchElementException;
-    void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError;
+    void proceed(Map<String, Object> response) throws NoSuchElementException, MidtransError, MessagingException;
 }
