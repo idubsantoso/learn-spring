@@ -20,9 +20,15 @@ public class RabbitMQFactoryConfiguration {
     @Value("${spring.rabbitmq.password}")
     private String password;
 
+    @Value("${spring.rabbitmq.virtual-host}")
+    private String vHost;
+
     @Bean
     public CachingConnectionFactory connectionFactory() {
         var cachingConnectionFactory = new CachingConnectionFactory(host);
+        if (!vHost.equals("local")) {
+            cachingConnectionFactory.setVirtualHost(vHost);
+        }
         cachingConnectionFactory.setUsername(username);
         cachingConnectionFactory.setPassword(password);
         return cachingConnectionFactory;

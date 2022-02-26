@@ -56,7 +56,7 @@ public class Payment implements Serializable {
     @JoinColumn(columnDefinition="bigint", name = "order_id", referencedColumnName = "id")
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(columnDefinition="bigint", name = "user_id", referencedColumnName = "id")
     @JsonIgnore
     private User user;
