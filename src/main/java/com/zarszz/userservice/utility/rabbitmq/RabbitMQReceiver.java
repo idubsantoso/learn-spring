@@ -81,6 +81,8 @@ public class RabbitMQReceiver implements RabbitListenerConfigurer {
                 payment.setRedirectUrl(redirectUrl);
 
                 paymentService.save(payment);
+
+                emailSenderService.sendPaymentEmail(payment.getUser().getName(), "ngaco@email.com", payment);
         }
     }
 }

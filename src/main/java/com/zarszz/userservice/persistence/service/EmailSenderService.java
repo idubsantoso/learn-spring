@@ -1,5 +1,6 @@
 package com.zarszz.userservice.persistence.service;
 
+import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.domain.SecretCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +54,30 @@ public class EmailSenderService {
 
         // Create the HTML body using Thymeleaf
         final String htmlContent = this.emailTemplateEngine.process("secret-code.html", ctx);
+        message.setText(htmlContent, true); // true = isHtml
+
+        // Send mail
+        this.mailSender.send(mimeMessage);
+    }
+
+    public void sendPaymentEmail(final String recipientName, final String recipientEmail, final Payment payment) throws MessagingException {
+        // Prepare the evaluation context
+        final Context ctx = new Context();
+        ctx.setVariable("name", recipientName);
+        ctx.setVariable("total", payment.getTotal());
+        ctx.setVariable("paymentLink", payment.getRedirectUrl());
+        ctx.setVariable("subscriptionDate", new Date());
+
+        // Prepare message using a Spring helper
+        final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+        final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8"); // true = multipart
+
+        message.setSubject("Mohon lanjutkan pembayaran anda");
+        message.setFrom(emailSource);
+        message.setTo(recipientEmail);
+
+        // Create the HTML body using Thymeleaf
+        final String htmlContent = this.emailTemplateEngine.process("process-payment.html", ctx);
         message.setText(htmlContent, true); // true = isHtml
 
         // Send mail
