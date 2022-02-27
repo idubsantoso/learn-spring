@@ -1,10 +1,7 @@
 package com.zarszz.userservice.persistence.service;
 
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import com.google.gson.Gson;
 import com.midtrans.httpclient.error.MidtransError;
@@ -13,6 +10,7 @@ import com.zarszz.userservice.domain.Order;
 import com.zarszz.userservice.domain.Payment;
 import com.zarszz.userservice.domain.enumData.OrderStatus;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
+import com.zarszz.userservice.requests.v1.order.CreatePaymentDto;
 import com.zarszz.userservice.utility.rabbitmq.RabbitMqSender;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.JobPurpose;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
@@ -58,7 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
             propagation = Propagation.REQUIRED,
             isolation = Isolation.SERIALIZABLE
     )
-    public void create(Long orderId) throws AlreadyCreatedException, MidtransError {
+    public void create(Long orderId, CreatePaymentDto paymentDto) throws AlreadyCreatedException, MidtransError {
         if (paymentRepository.findByOrderId(orderId).isPresent())
             throw new AlreadyCreatedException("Order already created");
         var order = orderService.getById(orderId);
@@ -68,6 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setOrder(order);
         payment.setStatus(PaymentStatus.PENDING);
         payment.setTotal(order.getSubTotal());
+        payment.setMethod(paymentDto.getPaymentMethod());
         var createdPayment = paymentRepository.save(payment);
         var message = new Message();
         var identity = new HashMap<>();
@@ -169,7 +168,7 @@ public class PaymentServiceImpl implements PaymentService {
             message.setMessage(gson.toJson(sendTransactionEmailMessage));
             message.setPurpose(JobPurpose.SEND_TRANSACTION_STATUS_EMAIL);
             rabbitMqSender.send(message);
-
+            payment.setPaymentDate(new Date());
             paymentRepository.save(payment);
         }
     }
