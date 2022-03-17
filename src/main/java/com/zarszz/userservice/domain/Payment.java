@@ -3,9 +3,7 @@ package com.zarszz.userservice.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.zarszz.userservice.domain.enumData.PaymentMethod;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,7 +16,8 @@ import java.util.Date;
 @Table(name = "payments", indexes = {
     @Index(name = "payment_code_idx", columnList = "payment_code", unique = true)
 })
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment implements Serializable {
@@ -52,7 +51,7 @@ public class Payment implements Serializable {
     @UpdateTimestamp
     private Date updatedAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(columnDefinition="bigint", name = "order_id", referencedColumnName = "id")
     private Order order;
 

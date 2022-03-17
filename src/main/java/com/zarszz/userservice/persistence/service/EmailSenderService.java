@@ -12,6 +12,7 @@ import org.thymeleaf.context.Context;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
@@ -103,6 +104,55 @@ public class EmailSenderService {
         // Create the HTML body using Thymeleaf
         final String htmlContent = this.emailTemplateEngine.process("transaction-status.html", ctx);
         message.setText(htmlContent, true); // true = isHtml
+
+        // Send mail
+        this.mailSender.send(mimeMessage);
+    }
+
+    public void sendInformationUserToPayment( final Payment payment) throws MessagingException {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(payment.getCreatedAt());
+        calendar.add(Calendar.DAY_OF_MONTH, 3);
+        // Prepare the evaluation context
+        final Context ctx = new Context();
+        ctx.setVariable("name", payment.getUser().getName());
+        ctx.setVariable("total", payment.getTotal());
+        ctx.setVariable("subscriptionDate", payment.getCreatedAt());
+        ctx.setVariable("paymentDeadline", calendar.getTime());
+        ctx.setVariable("paymentLink", payment.getRedirectUrl());
+
+        // Prepare message using a Spring helper
+        final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+        final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        message.setSubject("Pemberitahuan status transaksi");
+        message.setFrom(emailSource);
+        message.setTo(payment.getUser().getEmail());
+
+        // Create the HTML body using Thymeleaf
+        final String htmlContent = this.emailTemplateEngine.process("send-user-do-payment.html", ctx);
+        message.setText(htmlContent, true);
+
+        // Send mail
+        this.mailSender.send(mimeMessage);
+    }
+
+    public void sendInformationPaymentExpired( final Payment payment) throws MessagingException {
+        final Context ctx = new Context();
+        ctx.setVariable("subscriptionDate", payment.getCreatedAt());
+        ctx.setVariable("trxCode", payment.getPaymentCode());
+
+        // Prepare message using a Spring helper
+        final MimeMessage mimeMessage = this.mailSender.createMimeMessage();
+        final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+        message.setSubject("Pemberitahuan status transaksi");
+        message.setFrom(emailSource);
+        message.setTo(payment.getUser().getEmail());
+
+        // Create the HTML body using Thymeleaf
+        final String htmlContent = this.emailTemplateEngine.process("send-user-payment-expired.html", ctx);
+        message.setText(htmlContent, true);
 
         // Send mail
         this.mailSender.send(mimeMessage);

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:remove="all">Template for HTML email with inline image</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<p>
+    Anda telah melakukan order pada
+    <span th:text="${#dates.format(subscriptionDate)}">28-12-2012</span>
+</p>
+<p>
+    Maaf, order dengan nomor <span th:text="${trxCode}">XXX</span>
+    telah kadaluarsa
+</p>
+<p>
+    Regards, <em>Ngga Tau Team</em>
+</p>
+</body>
+</html>
