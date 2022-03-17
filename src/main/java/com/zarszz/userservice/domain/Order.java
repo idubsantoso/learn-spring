@@ -20,7 +20,7 @@ public class Order implements Serializable  {
     @Column(columnDefinition = "serial")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(columnDefinition="bigint", name = "user_id")
     @JsonIgnore
     private User user;

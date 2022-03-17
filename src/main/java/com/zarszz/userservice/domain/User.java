@@ -22,8 +22,16 @@ public class User implements Serializable {
     @Column(columnDefinition = "serial")
     private Long id;
 
+    @Column
     private String name;
+
+    @Column(length = 100)
+    private String email;
+
+    @Column
     private String username;
+
+    @Column
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
