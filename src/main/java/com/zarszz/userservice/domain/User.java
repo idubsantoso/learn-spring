@@ -3,6 +3,7 @@ package com.zarszz.userservice.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
@@ -36,4 +37,11 @@ public class User implements Serializable {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
+
+    public User(Object o, String name, String username, String password, String email, ArrayList<String> roles) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 }

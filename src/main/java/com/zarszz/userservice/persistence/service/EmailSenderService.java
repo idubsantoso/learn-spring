@@ -55,7 +55,7 @@ public class EmailSenderService {
 		ctx.setVariable("paymentLink", payment.getRedirectUrl());
 		ctx.setVariable("subscriptionDate", new Date());
 
-		sendMail(ctx, "Mohon lanjutkan pembayaran anda", "proceess-payment.html", recipientEmail);
+		sendMail(ctx, "Mohon lanjutkan pembayaran anda", "process-payment.html", recipientEmail);
 	}
 
 	public void sendTransactionStatusEmail(final String recipientEmail, final String state, final Payment payment) throws MessagingException {

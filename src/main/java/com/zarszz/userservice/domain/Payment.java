@@ -1,20 +1,27 @@
 package com.zarszz.userservice.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import com.zarszz.userservice.domain.enumData.PaymentMethod;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity()
 @Table(name = "payments", indexes = {
     @Index(name = "payment_code_idx", columnList = "payment_code", unique = true)
+})
+@TypeDefs({
+        @TypeDef(name = "json", typeClass = JsonBinaryType.class)
 })
 @Getter
 @Setter
@@ -34,6 +41,10 @@ public class Payment implements Serializable {
 
     @Column
     private String redirectUrl;
+
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
+    private TransactionDetails transactionDetails;
 
     @Enumerated(EnumType.ORDINAL)
     @Column

@@ -2,6 +2,7 @@ package com.zarszz.userservice.utility.rabbitmq;
 
 import com.google.gson.Gson;
 import com.midtrans.service.MidtransSnapApi;
+import com.zarszz.userservice.domain.TransactionDetails;
 import com.zarszz.userservice.domain.enumData.PaymentStatus;
 import com.zarszz.userservice.kernel.configs.rabbitmq.dto.Message;
 import com.zarszz.userservice.requests.v1.email.SendSecretCodeFromEmail;
@@ -18,6 +19,7 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistrar;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,6 +98,10 @@ public class RabbitMQReceiver implements RabbitListenerConfigurer {
                 params.put("transaction_details", transactionDetails);
                 var redirectUrl = midtransSnapApi.createTransactionRedirectUrl(params);
                 payment.setRedirectUrl(redirectUrl);
+                var paymentTransactionDetails = new TransactionDetails();
+                paymentTransactionDetails.setCode(paymentCode);
+                paymentTransactionDetails.setGrossAmount(new BigDecimal(payment.getTotal()));
+                payment.setTransactionDetails(paymentTransactionDetails);
                 paymentService.save(payment);
                 emailSenderService.sendPaymentEmail(payment.getUser().getName(), payment.getUser().getEmail(), payment);
             }
