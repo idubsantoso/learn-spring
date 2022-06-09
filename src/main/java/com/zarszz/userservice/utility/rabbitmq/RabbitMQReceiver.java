@@ -50,35 +50,35 @@ public class RabbitMQReceiver implements RabbitListenerConfigurer {
     public void receivedMessage(Message message) throws Exception {
         switch (message.getPurpose()) {
             case SEND_NOTIFICATION -> {
-                log.info("Purpose : SEND_NOTIFICATION, received message : {}", message.getMessage());
+                log.info("Purpose -> SEND_NOTIFICATION, received message -> {}", message.getMessage());
                 var notificationMessage = gson.fromJson(message.getMessage(), NotificationMessageDto.class);
                 String result = this.notificationService.sendNotificationRestTemplate(notificationMessage);
                 if (result.equals(""))
                     throw new Exception("Send notification failed");
             }
             case SEND_EMAIL -> {
-                log.info("Purpose : SEND_EMAIL, received message : {}", message.getMessage());
+                log.info("Purpose -> SEND_EMAIL, received message -> {}", message.getMessage());
                 var sendSecretCodeFromEmail = gson.fromJson(message.getMessage(), SendSecretCodeFromEmail.class);
                 emailSenderService.sendMailWithInline(
                         sendSecretCodeFromEmail.getRecipientName(), sendSecretCodeFromEmail.getRecipientEmail());
             }
             case SEND_TRANSACTION_STATUS_EMAIL -> {
-                log.info("Purpose : SEND_TRANSACTION_STATUS_EMAIL, received message : {}", message.getMessage());
+                log.info("Purpose -> SEND_TRANSACTION_STATUS_EMAIL, received message -> {}", message.getMessage());
                 var sendTransactionStatusEmail = gson.fromJson(message.getMessage(), SendTransactionStatusEmail.class);
                 var paymentEmail = paymentService.getById(sendTransactionStatusEmail.getPaymentId());
                 emailSenderService.sendTransactionStatusEmail(
                         sendTransactionStatusEmail.getRecipientEmail(),
                         sendTransactionStatusEmail.getState(), paymentEmail);
             }
-            case PROCESS_PAYMENT -> log.info("Purpose : PROCESS_PAYMENT, received message : {}", message.getMessage());
+            case PROCESS_PAYMENT -> log.info("Purpose -> PROCESS_PAYMENT, received message -> {}", message.getMessage());
             case SEND_DO_PAYMENT_EMAIL -> {
-                log.info("Purpose : SEND_DO_PAYMENT_EMAIL, received message : {}", message.getMessage());
+                log.info("Purpose -> SEND_DO_PAYMENT_EMAIL, received message -> {}", message.getMessage());
                 var identity = gson.fromJson(message.getMessage(), HashMap.class);
                 var paymentDoEmail = paymentService.getById(Long.valueOf((String) identity.get("id")));
                 emailSenderService.sendInformationUserToPayment(paymentDoEmail);
             }
             case SEND_INFORM_PAYMENT_EXPIRED -> {
-                log.info("Purpose : SEND_INFORM_PAYMENT_EXPIRED, received message : {}", message.getMessage());
+                log.info("Purpose -> SEND_INFORM_PAYMENT_EXPIRED, received message -> {}", message.getMessage());
                 var identityPaymentExpired = gson.fromJson(message.getMessage(), HashMap.class);
                 var paymentExpired = paymentService.getById(Long.valueOf((String) identityPaymentExpired.get("id")));
                 paymentExpired.setStatus(PaymentStatus.EXPIRED);
@@ -86,7 +86,7 @@ public class RabbitMQReceiver implements RabbitListenerConfigurer {
                 emailSenderService.sendInformationPaymentExpired(paymentExpired);
             }
             case CREATE_MIDTRANS_PAYMENT -> {
-                log.info("Purpose : CREATE_MIDTRANS_PAYMENT, received message : {}", message.getMessage());
+                log.info("Purpose -> CREATE_MIDTRANS_PAYMENT, received message -> {}", message.getMessage());
                 var paymentCode = "TRX" + RandomStringUtils.randomAlphanumeric(16).toUpperCase();
                 var paymentIdentity = gson.fromJson(message.getMessage(), HashMap.class);
                 var payment = paymentService.getById(Long.valueOf((String) paymentIdentity.get("id")));
